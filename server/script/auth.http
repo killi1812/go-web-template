@@ -39,6 +39,19 @@ Authorization: Bearer {{accessToken}}
   client.global.set("accessToken", json.accessToken);
 %}
 
+###
+# @name User Logout
+# User logout
+# This request logs out the logged in user
+POST {{host}}:{{port}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+
+# @lang=lua
+> {%
+  client.global.set("accessToken", "");
+%}
+
+
 
 
 ### Get my user data

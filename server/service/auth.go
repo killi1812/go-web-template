@@ -16,6 +16,7 @@ import (
 type IAuthService interface {
 	Login(email, password string) (string, error)
 	RefreshTokens(accessToken string) (string, error)
+	Logout(userUuid string) error
 }
 
 type AuthService struct {
@@ -59,13 +60,24 @@ func (s *AuthService) Login(email, password string) (string, error) {
 		return "", err
 	}
 
-	session := model.Session{
+	session := model.Session{}
+	rez := s.db.Where("user_uuid = ?", user.Uuid).First(&session)
+	if rez.Error != nil {
+		s.logger.Errorf("Failed to find old session, err = %w", err)
+		return "", rez.Error
+	}
+
+	if session.RefreshToken != "" {
+		s.logger.Infof("User with uuid = %s, is logging in again", user.Uuid.String())
+		s.Logout(user.Uuid.String())
+	}
+
+	session = model.Session{
 		UserId:       user.ID,
 		UserUuid:     user.Uuid,
 		RefreshToken: refresh,
 	}
-	rez := s.db.Create(&session)
-	if rez.Error != nil {
+	if rez := s.db.Create(&session); rez.Error != nil {
 		s.logger.Errorf("Failed to create a session, err = %w", err)
 		return "", rez.Error
 	}
@@ -133,4 +145,15 @@ func (s *AuthService) RefreshTokens(accessToken string) (string, error) {
 	}
 
 	return newAccessToken, nil
+}
+
+// Logout implements IAuthService.
+func (s *AuthService) Logout(userUuid string) error {
+	s.logger.Debugf("logging out user with uuid = %s", userUuid)
+	if rez := s.db.Where("user_uuid = ?", userUuid).Delete(&model.Session{}); rez.Error != nil {
+		s.logger.Errorf("Error session: %+v", rez)
+		return rez.Error
+	}
+
+	return nil
 }

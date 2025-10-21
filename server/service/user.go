@@ -61,7 +61,7 @@ func (u *UserCrudService) ReadAll() ([]model.User, error) {
 // Delete implements IUserCrudService.
 func (u *UserCrudService) Delete(_uuid uuid.UUID) error {
 	var user model.User
-	rez := u.db.Preload("License").Where("uuid = ?", _uuid).First(&user)
+	rez := u.db.Where("uuid = ?", _uuid).First(&user)
 	if rez.Error != nil {
 		if rez.RowsAffected == 0 {
 			u.logger.Debugf("User with UUID %s not found", _uuid)

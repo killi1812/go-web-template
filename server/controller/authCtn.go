@@ -37,7 +37,8 @@ func (c *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
 
 	// register Endpoints
 	group.POST("/login", c.login)
-	group.POST("/refresh", auth.Protect(), c.RefreshToken)
+	group.POST("/refresh", auth.Protect(), c.refreshToken)
+	group.POST("/logout", auth.Protect(), c.logout)
 }
 
 // Login godoc
@@ -78,7 +79,7 @@ func (l *AuthCtn) login(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	dto.TokenDto
 //	@Router			/auth/refresh [post]
-func (l *AuthCtn) RefreshToken(c *gin.Context) {
+func (l *AuthCtn) refreshToken(c *gin.Context) {
 	tokenStr := c.Request.Header.Get("Authorization")
 	token, err := l.auth.RefreshTokens(tokenStr)
 	if err != nil {
@@ -90,4 +91,30 @@ func (l *AuthCtn) RefreshToken(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.TokenDto{
 		AccessToken: token,
 	})
+}
+
+// Refresh godoc
+//
+//	@Summary		Refresh Access Token
+//	@Description	Generates a new access token using a valid refresh token
+//	@Tags			auth
+//	@Produce		json
+//	@Success		200	{object}	dto.TokenDto
+//	@Router			/auth/logout [post]
+func (l *AuthCtn) logout(c *gin.Context) {
+	_, claims, err := auth.ParseToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		l.logger.Errorf("Logout failed err = %w", err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = l.auth.Logout(claims.ID)
+	if err != nil {
+		l.logger.Errorf("Logout failed err = %w", err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.AbortWithStatus(http.StatusOK)
 }

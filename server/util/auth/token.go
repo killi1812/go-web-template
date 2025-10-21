@@ -7,14 +7,16 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Email    string         `json:"email"`
-	Username string         `json:"username"`
-	Role     model.UserRole `json:"role"`
+	Email     string         `json:"email"`
+	Username  string         `json:"username"`
+	Role      model.UserRole `json:"role"`
+	TokenUuid uuid.UUID      `json:"uuid"`
 }
 
 const (
@@ -45,11 +47,12 @@ func GenerateTokens(user *model.User) (string, string, error) {
 	if user == nil {
 		return "", "", cerror.ErrUserIsNil
 	}
-
+	uuidPair := uuid.New()
 	accessTokenClaims := &Claims{
-		Email:    user.Email,
-		Username: user.Username,
-		Role:     user.Role,
+		Email:     user.Email,
+		Username:  user.Username,
+		Role:      user.Role,
+		TokenUuid: uuidPair,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(_ACCESS_TOKEN_DURATION)),
 			ID:        user.Uuid.String(),
@@ -58,14 +61,15 @@ func GenerateTokens(user *model.User) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
 	accessTokenString, err := accessToken.SignedString([]byte(app.AccessKey))
 	if err != nil {
-		zap.S().Debugf("Failed to generate access token err = %+v", err)
+		zap.S().Errorf("Failed to generate access token err = %w", err)
 		return "", "", err
 	}
 
 	refreshTokenClaims := &Claims{
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     user.Role,
+		Username:  user.Username,
+		Email:     user.Email,
+		Role:      user.Role,
+		TokenUuid: uuidPair,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(_REFRESH_TOKEN_DURATION)),
 			ID:        user.Uuid.String(),
@@ -74,7 +78,7 @@ func GenerateTokens(user *model.User) (string, string, error) {
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 	refreshTokenString, err := refreshToken.SignedString([]byte(app.RefreshKey))
 	if err != nil {
-		zap.S().Debugf("Failed to generate refresh token err = %+v", err)
+		zap.S().Errorf("Failed to generate refresh token err = %w", err)
 		return "", "", err
 	}
 

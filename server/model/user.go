@@ -53,6 +53,7 @@ type User struct {
 	Email        string    `gorm:"type:varchar(100);unique;not null"`
 	PasswordHash string    `gorm:"type:varchar(255);not null"`
 	Role         UserRole  `gorm:"type:varchar(20);not null"`
+	Session      *Session  `gorm:"foreignKey:UserId;null"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {

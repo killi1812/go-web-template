@@ -44,7 +44,6 @@ func (cnt *GameCnt) RegisterEndpoints(router *gin.RouterGroup) {
 //	@Description	Web socket for lobby providing data for players
 //	@Tags			lobby
 //	@Produce		json
-//	@Success		200	{object}	lobbylgc.LobbyState
 //	@Failure		500
 //	@Router			/ws/lobby/{userId}/{clientId} [get]
 func (cnt *GameCnt) serveLobbyWs(c *gin.Context) {

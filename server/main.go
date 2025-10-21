@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// @securitydefinitions.bearerauth BearerAuth
+//	@securitydefinitions.bearerauth	BearerAuth
 
 func init() {
 	app.Setup()

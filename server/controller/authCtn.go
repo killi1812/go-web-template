@@ -4,12 +4,10 @@ import (
 	"net/http"
 	"template/app"
 	"template/dto"
-	"template/model"
 	"template/service"
 	"template/util/auth"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -39,7 +37,7 @@ func (c *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
 
 	// register Endpoints
 	group.POST("/login", c.login)
-	group.POST("/refresh", c.RefreshToken)
+	group.POST("/refresh", auth.Protect(), c.RefreshToken)
 }
 
 // Login godoc
@@ -60,13 +58,12 @@ func (l *AuthCtn) login(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := l.auth.Login(loginDto.Email, loginDto.Password)
+	accessToken, err := l.auth.Login(loginDto.Email, loginDto.Password)
 	if err != nil {
 		l.logger.Errorf("Login failed err = %+v", err)
 		c.JSON(http.StatusUnauthorized, err.Error())
 		return
 	}
-	zap.S().Debugf("Refresh: %s", refreshToken)
 
 	c.JSON(http.StatusOK, dto.TokenDto{
 		AccessToken: accessToken,
@@ -82,31 +79,13 @@ func (l *AuthCtn) login(c *gin.Context) {
 //	@Success		200	{object}	dto.TokenDto
 //	@Router			/auth/refresh [post]
 func (l *AuthCtn) RefreshToken(c *gin.Context) {
-	_, claims, err := auth.ParseToken(c.Request.Header.Get("Authorization"))
+	tokenStr := c.Request.Header.Get("Authorization")
+	token, err := l.auth.RefreshTokens(tokenStr)
 	if err != nil {
-		l.logger.Errorf("Error Parsing clames err = %+v", err)
+		l.logger.Errorf("Refresh failed err = %w", err)
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	userUuid, err := uuid.Parse(claims.ID)
-	if err != nil {
-		l.logger.Errorf("Error Parsing uuid err = %+v", err)
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	token, refreshNew, err := l.auth.RefreshTokens(&model.User{
-		Uuid:  userUuid,
-		Email: claims.Email,
-		Role:  claims.Role,
-	})
-	if err != nil {
-		l.logger.Error("Refresh failed err = %+v", err)
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	zap.S().Debugf("Refresh: %s", refreshNew)
 
 	c.JSON(http.StatusOK, dto.TokenDto{
 		AccessToken: token,

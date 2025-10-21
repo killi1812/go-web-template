@@ -6,5 +6,6 @@ package model
 func GetAllModels() []any {
 	return []any{
 		&User{},
+		&Session{},
 	}
 }

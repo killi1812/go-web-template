@@ -13,8 +13,7 @@ tasks:
 
   dev:
     desc: "Start app in development mode"
-    deps: [dc-start]
-    #deps: [dc-start, generate-swagger]
+    deps: [dc-start, generate-swagger]
     cmds:
       - defer: { task: dc-stop }
       - task: dev-deps
@@ -100,7 +99,7 @@ tasks:
     dir: ./server
     cmds:
       - cmd: swag fmt
-      - cmd: swag init --v3.1
+      - cmd: swag init
     silent: true
     internal: true
 

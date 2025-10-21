@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"template/app"
+	"template/model"
 	"template/util/auth"
 	"testing"
 	"time"
@@ -62,7 +63,7 @@ func (suite *MiddlewareTestSuite) performRequest(method, path, token string, bod
 }
 
 // Helper to generate a token
-func (suite *MiddlewareTestSuite) generateToken(userID, username string, userRole auth.UserRole, expiresAt time.Time) string {
+func (suite *MiddlewareTestSuite) generateToken(userID, username string, userRole model.UserRole, expiresAt time.Time) string {
 	claims := &auth.Claims{
 		Username: username,
 		Role:     userRole,

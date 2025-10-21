@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"errors"
 	"template/app"
 	"template/model"
+	"template/util/cerror"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -12,8 +12,9 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Username string   `json:"username"`
-	Role     UserRole `json:"role"`
+	Email    string         `json:"email"`
+	Username string         `json:"username"`
+	Role     model.UserRole `json:"role"`
 }
 
 const (
@@ -21,17 +22,11 @@ const (
 	_REFRESH_TOKEN_DURATION = 7 * 24 * time.Hour
 )
 
-var (
-	ErrInvalidCredentials = errors.New("invalid email or password")
-	ErrInvalidTokenFormat = errors.New("invalid token format")
-	ErrUserIsNil          = errors.New("user is nil")
-)
-
 func ParseToken(authHeader string) (*jwt.Token, *Claims, error) {
 	// Parse token
 	if len(authHeader) <= len("Bearer ") || authHeader[:len("Bearer ")] != "Bearer " {
 		zap.S().Debugf("token: %s", authHeader)
-		return nil, nil, ErrInvalidTokenFormat
+		return nil, nil, cerror.ErrInvalidTokenFormat
 	}
 	tokenString := authHeader[len("Bearer "):]
 	var claims Claims
@@ -48,15 +43,16 @@ func ParseToken(authHeader string) (*jwt.Token, *Claims, error) {
 // GenerateTokens return a jwt access token and refresh token or an error
 func GenerateTokens(user *model.User) (string, string, error) {
 	if user == nil {
-		return "", "", ErrUserIsNil
+		return "", "", cerror.ErrUserIsNil
 	}
 
 	accessTokenClaims := &Claims{
+		Email:    user.Email,
 		Username: user.Username,
-		//		Role:     user.Role,
+		Role:     user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(_ACCESS_TOKEN_DURATION)),
-			ID:        user.ID,
+			ID:        user.Uuid.String(),
 		},
 	}
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
@@ -68,10 +64,11 @@ func GenerateTokens(user *model.User) (string, string, error) {
 
 	refreshTokenClaims := &Claims{
 		Username: user.Username,
-		//Role:     user.Role,
+		Email:    user.Email,
+		Role:     user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(_REFRESH_TOKEN_DURATION)),
-			ID:        user.ID,
+			ID:        user.Uuid.String(),
 		},
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)

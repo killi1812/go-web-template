@@ -6,10 +6,12 @@ import (
 	"template/app"
 	"template/model"
 	"template/util/auth"
+	"template/util/cerror"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 func TestParseToken(t *testing.T) {
@@ -65,14 +67,14 @@ func TestParseToken(t *testing.T) {
 			authHeader: validTokenString,
 			wantToken:  false,
 			wantClaims: nil,
-			wantErr:    auth.ErrInvalidTokenFormat,
+			wantErr:    cerror.ErrInvalidTokenFormat,
 		},
 		{
 			name:       "Invalid token format - too short",
 			authHeader: "Bearer",
 			wantToken:  false,
 			wantClaims: nil,
-			wantErr:    auth.ErrInvalidTokenFormat,
+			wantErr:    cerror.ErrInvalidTokenFormat,
 		},
 		{
 			name:       "Invalid signature",
@@ -136,7 +138,7 @@ func TestGenerateTokens(t *testing.T) {
 
 	user := &model.User{
 		Username: "test@example.com",
-		ID:       "123",
+		Uuid:     uuid.New(),
 		//Role:     model.RoleMupADMIN,
 	}
 
@@ -187,7 +189,7 @@ func TestGenerateTokens(t *testing.T) {
 					return
 				}
 				if claims, ok := token.Claims.(*auth.Claims); ok {
-					if claims.Username != tt.user.Username || claims.ID != tt.user.ID {
+					if claims.Username != tt.user.Username || claims.ID != tt.user.Uuid.String() {
 						t.Errorf("GenerateTokens() access token claims are incorrect: got = %+v, want = %+v", claims, tt.user)
 					}
 					if !claims.ExpiresAt.After(time.Now().Add(accessTokenDuration-time.Minute)) || !claims.ExpiresAt.Before(time.Now().Add(accessTokenDuration+time.Minute)) {
@@ -205,7 +207,7 @@ func TestGenerateTokens(t *testing.T) {
 					return
 				}
 				if claims, ok := token.Claims.(*auth.Claims); ok {
-					if claims.Username != tt.user.Username || claims.ID != tt.user.ID {
+					if claims.Username != tt.user.Username || claims.ID != tt.user.Uuid.String() {
 						t.Errorf("GenerateTokens() refresh token claims are incorrect: got = %+v, want = %+v", claims, tt.user)
 					}
 					if !claims.ExpiresAt.After(time.Now().Add(refreshTokenDuration-time.Minute)) || !claims.ExpiresAt.Before(time.Now().Add(refreshTokenDuration+time.Minute)) {

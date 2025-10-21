@@ -3,16 +3,15 @@ package auth
 import (
 	"net/http"
 	"slices"
+	"template/model"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type UserRole string
-
 // Protect protects routes allowing access only to given roles (model.UserRole)
 // if roles are empty they it only checks for the validity of tokens
-func Protect(roles ...UserRole) gin.HandlerFunc {
+func Protect(roles ...model.UserRole) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

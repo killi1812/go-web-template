@@ -3,6 +3,8 @@ package app
 
 import (
 	"fmt"
+	"template/model"
+	"time"
 
 	"go.uber.org/dig"
 	"go.uber.org/zap"
@@ -42,5 +44,24 @@ func Setup() {
 	// Dig setup
 	{
 		digContainer = dig.New()
+	}
+
+	// gorm and Database setup
+	{
+		db := newDbConn()
+		sqlDB, err := db.DB()
+		if err != nil {
+			zap.S().Panicf("failed to get database connection: %+v", err)
+		}
+
+		sqlDB.SetMaxIdleConns(10)
+		sqlDB.SetMaxOpenConns(100)
+		sqlDB.SetConnMaxLifetime(time.Hour)
+
+		if err = db.AutoMigrate(model.GetAllModels()...); err != nil {
+			zap.S().Panicf("Can't run AutoMigrate err = %+v", err)
+		}
+
+		Provide(newDbConn)
 	}
 }

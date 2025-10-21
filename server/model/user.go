@@ -1,25 +1,75 @@
 package model
 
-// User represents a user in the lobby.
-// Based on https://discord.com/developers/docs/resources/user#user-object
+import (
+	"errors"
+	"template/util/cerror"
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type UserRole string
+
+const (
+	ROLE_USER        UserRole = "user"
+	ROLE_ADMIN       UserRole = "admin"
+	ROLE_SUPER_ADMIN UserRole = "superadmin"
+)
+
+// StrToUserRole converts string to UserRole
+func StrToUserRole(text string) (UserRole, error) {
+	role := UserRole(text)
+	switch role {
+	case ROLE_ADMIN:
+		return ROLE_ADMIN, nil
+	case ROLE_USER:
+		return ROLE_USER, nil
+	case ROLE_SUPER_ADMIN:
+		return ROLE_SUPER_ADMIN, nil
+
+	default:
+		return "", cerror.ErrUnknownRole
+	}
+}
+
+// _VALID_USER_ROLES contains all user roles and are they valid or not
+var _VALID_USER_ROLES = map[UserRole]bool{
+	ROLE_USER:        true,
+	ROLE_SUPER_ADMIN: true,
+	ROLE_ADMIN:       true,
+}
+
 type User struct {
-	ID            string  `json:"id"`
-	Username      string  `json:"username"`
-	Discriminator string  `json:"discriminator"`
-	GlobalName    *string `json:"global_name,omitempty"`
-	Avatar        *string `json:"avatar,omitempty"`
-	Bot           *bool   `json:"bot,omitempty"`
-	System        *bool   `json:"system,omitempty"`
-	MFAEnabled    *bool   `json:"mfa_enabled,omitempty"`
-	Banner        *string `json:"banner,omitempty"`
-	AccentColor   *int    `json:"accent_color,omitempty"`
-	Locale        *string `json:"locale,omitempty"`
-	Verified      *bool   `json:"verified,omitempty"`
-	Email         *string `json:"email,omitempty"`
-	Flags         *int    `json:"flags,omitempty"`
-	PremiumType   *int    `json:"premium_type,omitempty"`
-	PublicFlags   *int    `json:"public_flags,omitempty"`
-	// NOTE:
-	// Complex fields like avatar_decoration_data, collectibles, and primary_guild are omitted for simplicity.
-	// They can be added as their own structs if needed.
+	gorm.Model
+
+	Uuid         uuid.UUID `gorm:"type:uuid;unique;not null"`
+	Username     string    `gorm:"type:varchar(100);unique;not null"`
+	FirstName    string    `gorm:"type:varchar(100);not null"`
+	LastName     string    `gorm:"type:varchar(100);not null"`
+	OIB          string    `gorm:"type:char(11);unique;not null"`
+	Residence    string    `gorm:"type:varchar(255);not null"`
+	BirthDate    time.Time `gorm:"type:date;not null"`
+	Email        string    `gorm:"type:varchar(100);unique;not null"`
+	PasswordHash string    `gorm:"type:varchar(255);not null"`
+	Role         UserRole  `gorm:"type:varchar(20);not null"`
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if _, ok := _VALID_USER_ROLES[u.Role]; !ok {
+		return errors.New("invalid user role")
+	}
+	return nil
+}
+
+func (u *User) Update(user *User) *User {
+	u.BirthDate = user.BirthDate
+	u.FirstName = user.FirstName
+	u.LastName = user.LastName
+	u.OIB = user.OIB
+	u.Residence = user.Residence
+	u.Email = user.Email
+	u.Role = user.Role
+
+	return u
 }

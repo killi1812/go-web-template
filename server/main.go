@@ -27,9 +27,13 @@ func main() {
 	app.Provide(minio.New)
 
 	app.Provide(service.NewDiscordService)
+	app.Provide(service.NewUserCrudService)
+	app.Provide(service.NewAuthService)
 
 	app.RegisterController(controller.NewGameCnt)
 	app.RegisterController(controller.NewInfoCnt)
+	app.RegisterController(controller.NewUserCtn)
+	app.RegisterController(controller.NewAuthCtn)
 
 	app.Start()
 }

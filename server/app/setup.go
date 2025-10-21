@@ -41,6 +41,8 @@ func Setup() {
 		zap.S().Sync()
 	}
 
+	LoadConfig()
+
 	// Dig setup
 	{
 		digContainer = dig.New()

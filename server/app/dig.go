@@ -1,15 +1,11 @@
 package app
 
 import (
-	"sync"
-
 	"go.uber.org/dig"
 	"go.uber.org/zap"
 )
 
 var digContainer *dig.Container = nil
-
-var once = sync.Once{}
 
 // Test configures app so that it can be used in unit testing
 func Test() {

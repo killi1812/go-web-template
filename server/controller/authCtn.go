@@ -79,7 +79,7 @@ func (l *AuthCtn) login(c *gin.Context) {
 //	@Description	Generates a new access token using a valid refresh token
 //	@Tags			auth
 //	@Produce		json
-//	@Success		200				{object}	dto.TokenDto
+//	@Success		200	{object}	dto.TokenDto
 //	@Router			/auth/refresh [post]
 func (l *AuthCtn) RefreshToken(c *gin.Context) {
 	_, claims, err := auth.ParseToken(c.Request.Header.Get("Authorization"))

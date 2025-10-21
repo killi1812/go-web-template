@@ -10,7 +10,7 @@ import (
 )
 
 // LoadConfig loads in program configuration should be a first thing called in the program
-func LoadConfig() error {
+func LoadConfig() {
 	zap.S().Debugf("Loading env variables")
 
 	if err := godotenv.Load("../.env"); err != nil {
@@ -27,7 +27,7 @@ func LoadConfig() error {
 
 	// Database
 	DbConn = loadString("DB_CONN")
-	MongoConn = loadString("MONGO_CONNECTION_STRING")
+	MongoConn = loadString("MONGO_CONN")
 
 	// Minio
 	MIOEndpoint = loadString("MINIO_ENDPOINT")
@@ -36,7 +36,6 @@ func LoadConfig() error {
 	MIOUseSSL = loadBool("MINIO_USE_SSL")
 
 	zap.S().Debugf("Finished loading env variables")
-	return nil
 }
 
 func loadInt(name string) int {

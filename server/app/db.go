@@ -1,7 +1,6 @@
 package app
 
 import (
-	"os"
 	gormzap "template/util/gormZap"
 
 	"go.uber.org/zap"
@@ -17,8 +16,7 @@ func newDbConn() *gorm.DB {
 		Logger: gormzap.NewGormZapLogger().LogMode(logger.Warn),
 	})
 	if err != nil {
-		zap.S().Errorf("failed to connect database err = %+v", err)
-		os.Exit(5)
+		zap.S().Panicf("failed to connect database err = %+v", err)
 	}
 	return db
 }
@@ -28,8 +26,7 @@ func testDbConn() *gorm.DB {
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		zap.S().Errorf("failed to connect database err = %+v", err)
-		os.Exit(5)
+		zap.S().Panicf("failed to connect database err = %+v", err)
 	}
 	return db
 }

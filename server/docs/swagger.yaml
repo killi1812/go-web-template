@@ -29,19 +29,18 @@ definitions:
       password:
         minLength: 6
         type: string
-      policeToken:
-        type: string
       residence:
         maxLength: 255
         type: string
       role:
         enum:
-        - hak
-        - mupadmin
-        - osoba
-        - firma
-        - policija
+        - admin
+        - user
         - superadmin
+        type: string
+      username:
+        maxLength: 100
+        minLength: 2
         type: string
       uuid:
         type: string
@@ -54,6 +53,7 @@ definitions:
     - password
     - residence
     - role
+    - username
     type: object
   dto.TokenDto:
     properties:

@@ -448,7 +448,8 @@ const docTemplate = `{
                 "oib",
                 "password",
                 "residence",
-                "role"
+                "role",
+                "username"
             ],
             "properties": {
                 "birthDate": {
@@ -474,9 +475,6 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 6
                 },
-                "policeToken": {
-                    "type": "string"
-                },
                 "residence": {
                     "type": "string",
                     "maxLength": 255
@@ -484,13 +482,15 @@ const docTemplate = `{
                 "role": {
                     "type": "string",
                     "enum": [
-                        "hak",
-                        "mupadmin",
-                        "osoba",
-                        "firma",
-                        "policija",
+                        "admin",
+                        "user",
                         "superadmin"
                     ]
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
                 },
                 "uuid": {
                     "type": "string"

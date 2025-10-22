@@ -105,7 +105,8 @@ tasks:
 
   tunel:
     desc: "Open a temporary tunnel to app"
-    cmd: cloudflared tunnel --config ~/.cloudflared/config.yml run pc-dev
+    cmd: cloudflared tunnel --url http://localhost:8091
+    # cmd: cloudflared tunnel --config ~/.cloudflared/config.yml run pc-dev
     silent: true
     internal: false
 

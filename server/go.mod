@@ -1,7 +1,7 @@
 // TODO: change project name
 module template
 
-go 1.24.6
+go 1.25
 
 require (
 	github.com/gin-gonic/gin v1.11.0

@@ -161,6 +161,27 @@ tasks:
     desc: "Stop docker deps"
     cmd: docker-compose down -v
     silent: true
+  # _______________________
+  # |                     |
+  # |    Docker build     |
+  # |_____________________|
+
+  d-build:
+    desc: "build a docker image"
+    vars:
+      VERSION:
+        sh: git describe --tags --always --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*' 2> /dev/null | sed 's/^.//'
+    cmds:
+      - cmd: mkdir -p {{.BINARY_DIR}}
+      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} ./
+      - cmd: docker save -o {{.BINARY_DIR}}/{{.PACKAGE}}-{{.VERSION}}.tar {{.PACKAGE}}:latest
+
+    silent: true
+
+  # _______________________
+  # |                     |
+  # |       tools         |
+  # |_____________________|
 
   install-tools:
     desc: Install all the tools needed for project

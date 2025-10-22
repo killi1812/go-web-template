@@ -106,6 +106,19 @@ paths:
       summary: User login
       tags:
       - auth
+  /auth/logout:
+    post:
+      description: Generates a new access token using a valid refresh token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenDto'
+      summary: Refresh Access Token
+      tags:
+      - auth
   /auth/refresh:
     post:
       description: Generates a new access token using a valid refresh token

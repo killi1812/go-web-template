@@ -162,6 +162,13 @@ tasks:
     cmd: docker-compose down -v
     silent: true
 
+  install-tools:
+    desc: Install all the tools needed for project
+    cmds:
+      - cmd: go install github.com/air-verse/air@latest
+      - cmd: go install github.com/swaggo/swag/cmd/swag@latest
+    silent: false
+
   list-tools:
     desc: "List tool versions"
     cmds:

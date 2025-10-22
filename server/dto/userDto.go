@@ -23,7 +23,7 @@ type UserDto struct {
 	PoliceToken string `json:"policeToken"`
 }
 
-func (dto *UserDto) ToModel() (*model.User, error) {
+func (dto UserDto) ToModel() (*model.User, error) {
 	uuid, err := uuid.Parse(dto.Uuid)
 	if err != nil {
 		zap.S().Error("Failed to parse uuid = %s, err = %+v", dto.Uuid, err)
@@ -55,8 +55,8 @@ func (dto *UserDto) ToModel() (*model.User, error) {
 }
 
 // FromModel returns a dto from model struct
-func (dto UserDto) FromModel(m *model.User) UserDto {
-	dto = UserDto{
+func (dto *UserDto) FromModel(m *model.User) UserDto {
+	dto = &UserDto{
 		Uuid:      m.Uuid.String(),
 		FirstName: m.FirstName,
 		LastName:  m.LastName,
@@ -66,5 +66,5 @@ func (dto UserDto) FromModel(m *model.User) UserDto {
 		Email:     m.Email,
 		Role:      fmt.Sprint(m.Role),
 	}
-	return dto
+	return *dto
 }

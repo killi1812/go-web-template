@@ -129,7 +129,7 @@ func TestUserDto_FromModel(t *testing.T) {
 		Residence: "456 Oak Ave",
 		BirthDate: "1985-07-20",
 		Email:     "alice.smith@example.com",
-		Role:      "user",
+		Role:      string(model.ROLE_USER),
 	}
 
 	var gotDto dto.UserDto

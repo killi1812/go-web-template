@@ -62,12 +62,10 @@ func (s *AuthService) Login(email, password string) (string, error) {
 
 	session := model.Session{}
 	rez := s.db.Where("user_uuid = ?", user.Uuid).First(&session)
-	if rez.Error != nil {
-		s.logger.Errorf("Failed to find old session, err = %w", err)
+	if rez.Error != nil && !errors.Is(rez.Error, gorm.ErrRecordNotFound) {
+		s.logger.Errorf("Failed query session, err = %w", err)
 		return "", rez.Error
-	}
-
-	if session.RefreshToken != "" {
+	} else {
 		s.logger.Infof("User with uuid = %s, is logging in again", user.Uuid.String())
 		s.Logout(user.Uuid.String())
 	}

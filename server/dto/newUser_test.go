@@ -111,7 +111,7 @@ func TestNewUserDto_ToModel(t *testing.T) {
 				FirstName: "Bad",
 				LastName:  "UUID",
 				BirthDate: validDateStr,
-				Role:      "osoba",
+				Role:      string(model.ROLE_USER),
 				OIB:       "12345678901",
 				Email:     "bad.uuid@example.com",
 				Password:  "password",

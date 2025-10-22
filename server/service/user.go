@@ -71,6 +71,7 @@ func (u *UserCrudService) Delete(_uuid uuid.UUID) error {
 		return rez.Error
 	}
 
+	user.Username = fmt.Sprintf("deleted_user_%s", _uuid.String())
 	user.FirstName = "Deleted"
 	user.LastName = "User"
 	user.OIB = fmt.Sprintf("000000%05d", user.ID)
@@ -86,6 +87,12 @@ func (u *UserCrudService) Delete(_uuid uuid.UUID) error {
 	}
 
 	u.logger.Debugf("User with UUID %s anonymized successfully", _uuid)
+
+	if delRez := u.db.Delete(&user); delRez.Error != nil {
+		u.logger.Errorf("Error deleting anonymized user with UUID %s: %v", _uuid, saveRez.Error)
+		return saveRez.Error
+	}
+
 	return nil
 }
 
@@ -139,7 +146,6 @@ func (u *UserCrudService) Create(user *model.User, password string) (*model.User
 	return user, nil
 }
 
-// Gets all users except super admin
 func (u *UserCrudService) GetAllUsers() ([]model.User, error) {
 	var users []model.User
 	rez := u.db.

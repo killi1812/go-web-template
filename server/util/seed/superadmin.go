@@ -51,6 +51,7 @@ func createSuperAdmin() error {
 	}
 
 	dto := dto.NewUserDto{
+		Username:  "superadmin",
 		FirstName: "Super",
 		LastName:  "Admin",
 		Email:     "superadmin@test.hr",

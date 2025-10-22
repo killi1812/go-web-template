@@ -42,15 +42,13 @@ func (u *UserCtn) RegisterEndpoints(api *gin.RouterGroup) {
 	// Protected endpint
 	group.GET("/my-data", auth.Protect(), u.getLoggedInUser)
 
-	// HAK can search users by OIB for vehicle registration
-	group.GET("/oib/:oib", auth.Protect(model.ROLE_ADMIN), u.getUserByOib)
-
 	// register Endpoints
 	group.Use(auth.Protect(model.ROLE_SUPER_ADMIN, model.ROLE_ADMIN))
 	group.POST("/", u.create)
 	group.GET("/:uuid", u.get)
 	group.PUT("/:uuid", u.update)
 	group.DELETE("/:uuid", u.delete)
+	group.GET("/oib/:oib", u.getUserByOib)
 	group.GET("/all-users", u.getAllUsersForSuperAdmin)
 	group.GET("/search", u.searchUsersByName)
 }

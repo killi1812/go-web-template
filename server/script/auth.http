@@ -50,10 +50,3 @@ Authorization: Bearer {{accessToken}}
 > {%
   client.global.set("accessToken", "");
 %}
-
-
-
-
-### Get my user data
-GET {{host}}:{{port}}/api/user/my-data
-Authorization: Bearer {{accessToken}}

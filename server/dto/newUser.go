@@ -11,17 +11,16 @@ import (
 )
 
 type NewUserDto struct {
-	Uuid        string `json:"uuid"`
-	Username    string `json:"username" binding:"required,min=2,max=100"`
-	FirstName   string `json:"firstName" binding:"required,min=2,max=100"`
-	LastName    string `json:"lastName" binding:"required,min=2,max=100"`
-	OIB         string `json:"oib" binding:"required,len=11"`
-	Residence   string `json:"residence" binding:"required,max=255"`
-	BirthDate   string `json:"birthDate" binding:"required,datetime=2006-01-02"`
-	Email       string `json:"email" binding:"required,email"`
-	Password    string `json:"password" binding:"required,min=6"`
-	Role        string `json:"role" binding:"required,oneof=admin user superadmin"`
-	PoliceToken string `json:"policeToken"`
+	Uuid      string `json:"uuid"`
+	Username  string `json:"username" binding:"required,min=2,max=100"`
+	FirstName string `json:"firstName" binding:"required,min=2,max=100"`
+	LastName  string `json:"lastName" binding:"required,min=2,max=100"`
+	OIB       string `json:"oib" binding:"required,len=11"`
+	Residence string `json:"residence" binding:"required,max=255"`
+	BirthDate string `json:"birthDate" binding:"required,datetime=2006-01-02"`
+	Email     string `json:"email" binding:"required,email"`
+	Password  string `json:"password" binding:"required,min=6"`
+	Role      string `json:"role" binding:"required,oneof=admin user superadmin"`
 }
 
 // ToModel create a model from a dto
@@ -58,8 +57,8 @@ func (dto NewUserDto) ToModel() (*model.User, error) {
 }
 
 // FromModel returns a dto from model struct
-func (dto *NewUserDto) FromModel(m *model.User) NewUserDto {
-	dto = &NewUserDto{
+func (NewUserDto) FromModel(m *model.User) NewUserDto {
+	dto := NewUserDto{
 		Uuid:      m.Uuid.String(),
 		Username:  m.Username,
 		FirstName: m.FirstName,
@@ -70,5 +69,5 @@ func (dto *NewUserDto) FromModel(m *model.User) NewUserDto {
 		Email:     m.Email,
 		Role:      string(m.Role),
 	}
-	return *dto
+	return dto
 }

@@ -159,7 +159,7 @@ func TestNewUserDto_FromModel(t *testing.T) {
 		Role:         model.ROLE_SUPER_ADMIN,
 	}
 
-	expectedDto := &dto.NewUserDto{
+	expectedDto := dto.NewUserDto{
 		Uuid:      userUUID.String(),
 		FirstName: "ModelF",
 		LastName:  "ModelL",
@@ -171,8 +171,7 @@ func TestNewUserDto_FromModel(t *testing.T) {
 		Role:      string(model.ROLE_SUPER_ADMIN),
 	}
 
-	var d dto.NewUserDto
-	gotDto := d.FromModel(userModel)
+	gotDto := dto.NewUserDto{}.FromModel(userModel)
 
 	assert.Equal(t, expectedDto, gotDto)
 }

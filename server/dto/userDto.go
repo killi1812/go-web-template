@@ -55,8 +55,8 @@ func (dto UserDto) ToModel() (*model.User, error) {
 }
 
 // FromModel returns a dto from model struct
-func (dto *UserDto) FromModel(m *model.User) UserDto {
-	dto = &UserDto{
+func (UserDto) FromModel(m *model.User) UserDto {
+	dto := &UserDto{
 		Uuid:      m.Uuid.String(),
 		FirstName: m.FirstName,
 		LastName:  m.LastName,

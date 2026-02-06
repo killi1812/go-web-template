@@ -67,10 +67,6 @@ func (suite *authTestSuite) SetupSuite() {
 	suite.seededUser = &user
 }
 
-func (suite *authTestSuite) SetupTest() {
-
-}
-
 // TearDownSuite runs once after all tests in the suite have finished.
 func (suite *authTestSuite) TearDownSuite() {
 	if suite.logger != nil {
@@ -196,3 +192,4 @@ func (suite *authTestSuite) TestRefreshTokens_NoSession() {
 	suite.ErrorIs(err, gorm.ErrRecordNotFound)
 	suite.Empty(newAccessToken)
 }
+
